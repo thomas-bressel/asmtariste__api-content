@@ -1,0 +1,8 @@
+{
+  "name": "api-content",
+  "version": "1.0.0",
+  "architecture": "Clean Architecture",
+  "language": "typescript",
+  "express": true,
+  "created_at": "2025-06-23T21:06:54.401416238+02:00"
+}
