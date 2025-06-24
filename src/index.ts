@@ -1,22 +1,51 @@
+/**
+ * The main server file for the React_Node application.
+ * @module index
+**/
+// Express importation
+import express, { Express } from "express";
 
-			import express, { Express, Request, Response } from 'express';
-			const server = express();
-			const PORT = 3000;
+// Environnement library need
+require('dotenv').config();
 
-			// Routes
-			server.get('/', (req: Request, res: Response) => {
-			  res.json({
-			    message: 'Welcome to Archi API',
-			    version: '1.0.0',
-			    status: 'running',
-			    stack: 'NodeJS, Typescript',
-			    library: 'ExpressJS'
-			  });
-			});
+// ConfigServer importation
+import ServerConfig from "./infrastructure/server/server.config"
 
-			// Start server
-			server.listen(PORT, () => {
-			  console.log('Server running on http://' + 'localhost:' + PORT);
-			});
+// user app components routes
 
-			export default server;
+
+// Color importation
+import { CONSOLE_COLORS } from "./shared/constants/console-colors.constants";
+
+
+// Middleware importation
+import CorsMiddleware from "./presentation/middlewares/cors.middleware";
+
+
+const server: Express = express();
+
+// get port server number from ServerConfig
+server.listen(ServerConfig.getApiListenPort(), () => {
+  console.warn(CONSOLE_COLORS.magenta, "Server listened on port number ", ServerConfig.getApiListenPort());
+  console.warn(CONSOLE_COLORS.bgMagenta, `API NAME -> ${ServerConfig.getName()} - API VERSION -> ${ServerConfig.getVersion()}`);
+});
+
+// CORS configuration
+try {
+  const corsConfig = CorsMiddleware.getCorsConfig();
+  const cors = require("cors");
+  server.use(cors(corsConfig));
+} catch (error: any) {
+  console.error("Error during CORS config : ", error.message);
+}
+
+
+import tagRoutes from "./presentation/routes/tag.routes"
+server.use('', tagRoutes);
+
+server.get('/', (req, res) => {
+	res.send('Asmtariste API public route');
+  }
+  );
+  
+  export default server;

@@ -1,0 +1,78 @@
+name: Deploy to VPS
+on:
+  push:
+    branches: [ main ]
+ 
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npx jest
+
+  deploy:
+    needs: test
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          echo "🚀 Starting deployment..."
+                   
+          # Vérifier si le dossier existe
+          if [ ! -d "$HOME/asmtariste/asmtariste__api-user" ]; then
+            echo "❌ Directory $HOME/asmtariste/asmtariste__api-user does not exist!"
+            exit 1
+          fi
+          
+          # Aller dans le dossier du projet
+          cd ~/asmtariste/asmtariste__api-user
+          echo "📍 Now in: $(pwd)"
+          
+          # Forcer la mise à jour (écraser les modifications locales)
+          # echo "📥 Resetting local changes and pulling..."
+          # git reset --hard HEAD
+          # git clean -fd
+          git pull origin main
+          
+          
+          # Vérifier docker-compose dans le parent
+          echo "🐳 Checking docker-compose file in parent directory:"
+          ls -la ../docker-compose.yml || echo "⚠️ docker-compose.yml not found in parent!"
+          
+          # Arrêter les containers existants (depuis le parent)
+          echo "🛑 Stopping containers..."
+          cd .. && docker compose down || echo "⚠️ No containers to stop"
+          
+          # Rebuild et redémarrer (depuis le parent)
+          echo "🔨 Building and starting containers..."
+          docker compose up -d --build
+          
+          # Vérifier que tout fonctionne
+          echo "✅ Checking containers status..."
+          docker compose ps
+          
+          echo "🎉 Deployment completed!"
