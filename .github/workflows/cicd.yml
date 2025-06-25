@@ -31,48 +31,40 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/asmtariste-api-content:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/asmtariste-api-content:${{ github.sha }}
+        platforms: linux/amd64,linux/arm64
       
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_PRIVATE_SSH_KEY }}
+        key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT }}
-        script: |
-          echo "🚀 Starting deployment..."
-                   
-          # Vérifier si le dossier existe
-          if [ ! -d "$HOME/asmtariste/api-content" ]; then
-            echo "❌ Directory $HOME/asmtariste/api-content does not exist!"
-            exit 1
-          fi
-          
-          # Aller dans le dossier du projet
-          cd ~/asmtariste/api-content
-          echo "📍 Now in: $(pwd)"
-          
-          # Forcer la mise à jour (écraser les modifications locales)
-          # echo "📥 Resetting local changes and pulling..."
-          # git reset --hard HEAD
-          # git clean -fd
-          git pull origin main
-          
-          
-          # Vérifier docker-compose dans le parent
-          echo "🐳 Checking docker-compose file in parent directory:"
-          ls -la ../docker-compose.yml || echo "⚠️ docker-compose.yml not found in parent!"
-          
-          # Arrêter les containers existants (depuis le parent)
-          echo "🛑 Stopping containers..."
-          cd .. && docker compose down || echo "⚠️ No containers to stop"
-          
-          # Rebuild et redémarrer (depuis le parent)
-          echo "🔨 Building and starting containers..."
-          docker compose up -d --build
-          
-          # Vérifier que tout fonctionne
-          echo "✅ Checking containers status..."
+        script: |        
+          cd asmtariste
+        
+          docker compose down
+       
+          docker compose pull
+       
+          docker compose up -d
+       
           docker compose ps
-          
-          echo "🎉 Deployment completed!"
