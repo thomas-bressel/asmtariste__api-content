@@ -11,11 +11,11 @@ export class TagMapper {
     static toEntity(row: TagEntity): TagEntity {
         return new TagEntity(
             row.id_tags,
-            row.label,
             row.color,
+            row.label,
+            row.is_display,
             row.background_color,
             row.border_color,
-            row.is_display,
         );
     }
 

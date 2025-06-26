@@ -5,10 +5,10 @@ export class TagResponseDTO {
   constructor(
     public id_tags: number,
     public color: string,
-    public background_color: string,
-    public border_color: string,
     public label: string,
     public is_display: boolean,
+    public background_color: string,
+    public border_color: string,
   ) {}
 
   /**
@@ -20,10 +20,10 @@ export class TagResponseDTO {
     return new TagResponseDTO(
       tag.id_tags,
       tag.color,
-      tag.background_color,
-      tag.border_color,
       tag.label,
       tag.is_display,
+      tag.background_color,
+      tag.border_color,
     );
   }
 

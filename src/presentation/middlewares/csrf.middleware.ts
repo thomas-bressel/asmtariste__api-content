@@ -55,6 +55,7 @@ class CsrfMiddleware {
      */
     public authToken(req: Request, res: Response, next: NextFunction): void {
         const token = this.extractToken(req);
+        console.log(token)
         if (!this.isTokenValid(token)) {
             res.status(401).json({
                 error: 'Token missing or invalid',

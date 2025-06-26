@@ -3,7 +3,8 @@ import { Request, Response } from "express";
 
 // Service importation
 import TagService from "../../data/services/tag.service";
-
+import { TagDTO } from "../../data/dtos/tag.dto";
+import { validate } from "class-validator";
 
 
 class TagController {
@@ -32,6 +33,37 @@ class TagController {
       return res.status(500).json({ message: (error instanceof Error ? error.message : "Erreur interne du serveur") });
     }
   }
+
+
+
+
+/**
+ * create a new tag
+ * @param req 
+ * @param res 
+ * @returns 
+ */
+public async createTag(req: Request, res: Response): Promise<Response> {
+
+  try {
+    // Step 1 : entering data validation
+    const tagValidationDTO = new TagDTO(req.body);
+
+    const errors = await validate(tagValidationDTO);
+    if (errors.length > 0) return res.status(400).json({ message: 'Les données fournies ne sont pas valides.', errors });
+    
+    // Step 2 : Mapping request data into a DTO
+    const tagDTO = new TagDTO(tagValidationDTO);
+
+    // Step 3 : Send DTO to the service
+    const response = await this.tagService.createTag(tagDTO);
+    return res.status(201).json(response);
+
+  } catch (error) {
+    console.error("Erreur dans TagController - createTag :", error);
+    return res.status(500).json({ message: (error instanceof Error ? error.message : "Erreur interne du serveur") });
+  }
+}
 
 
 }
