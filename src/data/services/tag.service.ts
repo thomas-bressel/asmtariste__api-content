@@ -45,19 +45,35 @@ class TagService {
    */
   public async createTag(tagData: TagDTO): Promise<number> {
 
-    // Vérification d'existence du tag
+    // Check if tag exists
     const TagExists = await this.tagRepository.isTagLabelExist(tagData.label);
     if (TagExists) throw new Error("Ce tag existe déjà");
 
     const entity = TagMapper.toEntity(tagData);
 
-    // Création en BDD
+    // periste tag into Database
     const createdRows = await this.tagRepository.createTag(entity);
     if (!createdRows) throw new Error("Erreur lors de la création du tag!");
     return createdRows;
   }
 
 
+/**
+ * 
+ * @param id 
+ * @returns 
+ */
+  public async deleteTag(id: number): Promise<{ success: boolean; removed: number }> {
+
+    // Check if the tag to delete exist and then catch its datas
+    const tagToDelete = await this.tagRepository.getTagById(id);
+    if (!tagToDelete) throw new Error("Ce tag n\'existe pas");
+
+    // On supprime le tagen base donnée
+    const deletedTag = await this.tagRepository.deleteTag(id);
+    if (!deletedTag) throw new Error("Erreur lors de la suppression du tag");
+    return deletedTag;
+  }
 
 }
 

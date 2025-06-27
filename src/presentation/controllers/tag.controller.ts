@@ -66,6 +66,28 @@ public async createTag(req: Request, res: Response): Promise<Response> {
 }
 
 
+
+
+/**
+ * delete a selected tag by its ID
+ * @param req 
+ * @param res 
+ * @returns 
+ */
+public async deleteTag(req: Request, res: Response): Promise<Response> {
+  try {
+    const id = parseInt(req.query.id as string);
+    if (!id || id === null) return res.status(404).json({ message: "ID de tag invalide" });
+
+    const response = await this.tagService.deleteTag(id);
+    if (!response) return res.status(400).json({ message: "Erreur lors de la suppression du tag" });
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Erreur dans TagController - deleteTag :", error);
+    return res.status(500).json({ message: (error instanceof Error ? error.message : "Erreur interne du serveur") });
+  }
+}
 }
 
 export default TagController;

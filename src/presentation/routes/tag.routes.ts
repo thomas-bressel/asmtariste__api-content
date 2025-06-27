@@ -31,4 +31,7 @@ router.get("/content/v1/admin/tags", csrfMiddleware.authToken, permissionMiddlew
 router.post("/content/v1/admin/tag/create", csrfMiddleware.authToken, permissionMiddleware.check('CREATE_TAG'),  async (req: Request, res: Response) => { 
     tagController.createTag(req, res)
 });
+router.delete("/content/v1/admin/tag/delete", csrfMiddleware.authToken, permissionMiddleware.check('DELETE_TAiG'),  async (req: Request, res: Response) => { 
+    tagController.deleteTag(req, res)
+});
 export default router;
