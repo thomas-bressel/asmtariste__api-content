@@ -4,6 +4,7 @@
 **/
 // Express importation
 import express, { Express } from "express";
+import path from 'path';
 
 // Environnement library need
 require('dotenv').config();
@@ -41,11 +42,18 @@ try {
 
 
 import tagRoutes from "./presentation/routes/tag.routes"
+import articleRoutes from "./presentation/routes/article.routes"
 server.use('', tagRoutes);
+server.use('', articleRoutes);
+
+// Define static folders
+server.use('/articles', express.static(path.join(__dirname, '../uploads/articles'), {
+  maxAge: '7d',
+  etag: true
+}));
 
 server.get('/', (req, res) => {
 	res.send('Asmtariste API public route');
-  }
-  );
+  });
   
   export default server;

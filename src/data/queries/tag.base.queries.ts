@@ -42,7 +42,7 @@ export abstract class TagBaseQueries {
 
 
     /**
-     * 
+     * Delete a tag from agreggate table 
      * @returns 
      */
     protected deleteTagAssociationsQuery(): string {
@@ -52,7 +52,7 @@ export abstract class TagBaseQueries {
 
 
     /**
-     * 
+     * Delete a tag from tag table
      * @returns 
      */
     protected deleteTagQuery(): string {

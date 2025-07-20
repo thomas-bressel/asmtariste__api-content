@@ -1,7 +1,7 @@
 import MySQLContentModule from "../../infrastructure/database/mysql-content.connexion";
 import { createPool, Pool } from "mysql2/promise";
 import { TagQueries } from "../../data/queries/tag.queries";
-import TagEntity from "../../domain/entities/tag.entity";
+import Tag from "../../domain/entities/tag.entity";
 import { ResultSetHeader } from 'mysql2';
 
 
@@ -34,7 +34,7 @@ class TagRepository {
    * Get all tags
    * @returns 
    */
-  public async getAllTags(): Promise<TagEntity[]> {
+  public async getAllTags(): Promise<Tag[]> {
     let connection;
     if (!(await this.isDatabaseReachable(this.poolContent))) throw new Error("DATABASE_UNREACHABLE");
 
@@ -84,14 +84,14 @@ class TagRepository {
    * @param validatedDataTag 
    * @returns the created data
    */
-  public async createTag(tagEntity: TagEntity): Promise<number> {
+  public async createTag(tag: Tag): Promise<number> {
 
     if (!(await this.isDatabaseReachable(this.poolContent))) throw new Error("DATABASE_UNREACHABLE");
 
     let connection;
     try {
       connection = await this.poolContent.getConnection();
-      const [rows] = await connection.query<ResultSetHeader>(this.tagQueries.createTag(), [tagEntity.label, tagEntity.color, tagEntity.background_color, tagEntity.border_color, tagEntity.is_display]);
+      const [rows] = await connection.query<ResultSetHeader>(this.tagQueries.createTag(), [tag.label, tag.color, tag.background_color, tag.border_color, tag.is_display]);
       return rows.insertId;
     } catch (error) {
       console.error("Erreur MySQL:", error);
@@ -104,11 +104,11 @@ class TagRepository {
 
 
 
-/**
- * 
- * @param id 
- * @returns 
- */
+  /**
+   * Get a tag by its id
+   * @param id 
+   * @returns 
+   */
   public async getTagById(id: number): Promise<boolean> {
 
     let connection;
@@ -131,28 +131,32 @@ class TagRepository {
 
 
 
-
+  /**
+   * Delete tag in the association table and in tags table
+   * @param id 
+   * @returns 
+   */
   public async deleteTag(id: number): Promise<{ success: boolean; removed: number }> {
     let connection;
-  
+
     if (!(await this.isDatabaseReachable(this.poolContent))) {
       throw new Error("DATABASE_UNREACHABLE");
     }
-  
+
     try {
       connection = await this.poolContent.getConnection();
       await connection.beginTransaction();
-  
+
       const [assocResult] = await connection.query<any>(this.tagQueries.deleteTagAssociations(), [id]);
-  
+
       const [tagResult] = await connection.query<any>(this.tagQueries.deleteTag(), [id]);
-  
+
       await connection.commit();
       return {
         success: tagResult.affectedRows > 0,
         removed: tagResult.affectedRows
       };
-  
+
     } catch (error) {
       if (connection) await connection.rollback();
       console.error("Erreur MySQL:", error);

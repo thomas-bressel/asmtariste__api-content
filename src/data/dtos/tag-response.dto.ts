@@ -1,4 +1,4 @@
-import  TagEntity  from '../../domain/entities/tag.entity';
+import  Tag  from '../../domain/entities/tag.entity';
 
 
 export class TagResponseDTO {
@@ -16,7 +16,7 @@ export class TagResponseDTO {
    * @param tag 
    * @returns 
    */
-  static fromEntity(tag: TagEntity): TagResponseDTO {
+  static fromEntity(tag: Tag): TagResponseDTO {
     return new TagResponseDTO(
       tag.id_tags,
       tag.color,
@@ -33,7 +33,7 @@ export class TagResponseDTO {
    * @param tags 
    * @returns 
    */
-  static fromEntities(tags: TagEntity[]): TagResponseDTO[] {
+  static fromEntities(tags: Tag[]): TagResponseDTO[] {
     return tags.map((tag) => TagResponseDTO.fromEntity(tag));
   }
 

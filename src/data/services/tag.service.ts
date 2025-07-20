@@ -4,7 +4,7 @@ import TagRepository from "../repositories/tag.repository";
 // DTO import
 import { TagResponseDTO } from "../dtos/tag-response.dto";
 import { TagDTO } from "../dtos/tag.dto";
-import TagEntity from "../../domain/entities/tag.entity";
+import Tag from "../../domain/entities/tag.entity";
 import { TagMapper } from "../mappers/tag.mapper";
 
 
@@ -23,10 +23,10 @@ class TagService {
   public async getAllTags(): Promise<TagResponseDTO[]> {
 
   // 1. get raw datas from the database
-  const rawTags: TagEntity[] = await this.tagRepository.getAllTags();
+  const rawTags: Tag[] = await this.tagRepository.getAllTags();
 
-  // 2. Convert datas into a TagEntity entity
-  const tagEntities: TagEntity[] = TagMapper.toEntities(rawTags);
+  // 2. Convert datas into a Tag entity
+  const tagEntities: Tag[] = TagMapper.toEntities(rawTags);
 
   // 3. Convert Entity into a Response DTO (the right format to expose to the client)
   const tagResponseDTOs: TagResponseDTO[] = TagResponseDTO.fromEntities(tagEntities);
@@ -69,7 +69,7 @@ class TagService {
     const tagToDelete = await this.tagRepository.getTagById(id);
     if (!tagToDelete) throw new Error("Ce tag n\'existe pas");
 
-    // On supprime le tagen base donnée
+    // Delete tag into database
     const deletedTag = await this.tagRepository.deleteTag(id);
     if (!deletedTag) throw new Error("Erreur lors de la suppression du tag");
     return deletedTag;
