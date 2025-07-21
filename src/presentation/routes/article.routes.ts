@@ -25,7 +25,7 @@ router.use(BodyParserMiddleware.urlEncodedParser);
 router.use(BodyParserMiddleware.jsonParser);
 
 
-router.get("/content/v1/admin/articles",  async (req: Request, res: Response) => { 
+router.get("/content/v1/admin/articles", csrfMiddleware.authToken, permissionMiddleware.check("VIEW_ALL_ARTICLES"), async (req: Request, res: Response) => { 
     articleController.getAllArticles(req, res)
 });
 
