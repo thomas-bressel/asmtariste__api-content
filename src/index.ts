@@ -43,8 +43,10 @@ try {
 
 import tagRoutes from "./presentation/routes/tag.routes"
 import articleRoutes from "./presentation/routes/article.routes"
+import surveyRoutes from "./presentation/routes/survey.routes"
 server.use('', tagRoutes);
 server.use('', articleRoutes);
+server.use('', surveyRoutes);
 
 // Define static folders
 server.use('/articles', express.static(path.join(__dirname, '../uploads/articles'), {

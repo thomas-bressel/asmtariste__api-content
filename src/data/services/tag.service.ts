@@ -38,10 +38,8 @@ class TagService {
 
 
   /**
-   * Create a new user
-   * @param userData 
-   * @param userFile 
-   * @returns 
+   * Create a new tag
+    * @returns 
    */
   public async createTag(tagData: TagDTO): Promise<number> {
 
